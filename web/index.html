@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Guide Cane Monitor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#speech-read">Skip to speech controls</a>
+  <main>
+    <div id="connection-banner" class="connection-banner offline" role="status" aria-live="polite" aria-atomic="true">
+      <span id="connection-icon" class="connection-icon" aria-hidden="true">🔴</span>
+      <strong id="connection-status-text">Device disconnected. No live data. Check the connection.</strong>
+    </div>
+    <header class="page-header">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M14 8h6l10 24" fill="none" stroke="#1672e8" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="32" cy="36" r="5" fill="none" stroke="#13866d" stroke-width="2.4"/>
+          <path d="M8 40h32" fill="none" stroke="#5999ea" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1>Smart Guide Cane</h1>
+          <p class="brand-caption">Awareness with every step</p>
+        </div>
+      </div>
+      <button id="connect" class="button-secondary" type="button">Connect</button>
+    </header>
+    <nav class="app-navigation" aria-label="Main views">
+      <div class="nav-tabs" role="tablist" aria-label="Guide cane features">
+        <button id="tab-monitor" class="nav-tab" type="button" role="tab" aria-selected="true" aria-controls="page-monitor" tabindex="0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Monitor</span>
+        </button>
+        <button id="tab-device" class="nav-tab" type="button" role="tab" aria-selected="false" aria-controls="page-device" tabindex="-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 6a3 3 0 0 1 6 0v3l4 12M14 9 9 21M6 21h5m5 0h4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Cane status</span>
+        </button>
+        <button id="tab-logs" class="nav-tab" type="button" role="tab" aria-selected="false" aria-controls="page-logs" tabindex="-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6m-6 4h6m-6 4h4" stroke-linecap="round"/></svg><span>Data logs</span>
+        </button>
+      </div>
+    </nav>
+    <p id="message" class="message" role="status" aria-live="polite"></p>
+    <section id="page-monitor" class="app-page" role="tabpanel" aria-labelledby="tab-monitor" tabindex="0">
+      <div class="page-intro"><p class="eyebrow">Live monitoring</p><h2>Stay aware. Move with confidence.</h2><p>Live conditions and spoken alerts, within reach.</p></div>
+    <section class="speech-panel" aria-labelledby="speech-title">
+      <div class="speech-main">
+        <h2 id="speech-title">Voice assistant</h2>
+        <div class="speech-controls">
+          <button id="speech-read" type="button" aria-describedby="speech-feedback">
+            <svg class="speech-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" stroke-linejoin="round"/><path d="M16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" stroke-linecap="round"/></svg>
+            Read status
+          </button>
+          <label class="auto-toggle">
+            <input id="speech-auto" type="checkbox" role="switch" aria-checked="false" aria-label="Auto announcements" aria-describedby="speech-feedback">
+            <span class="switch-track" aria-hidden="true"></span><span>Auto announcements</span>
+          </label>
+          <button id="speech-stop" class="button-secondary" type="button" hidden disabled>Stop speech</button>
+        </div>
+      </div>
+
+      <p id="speech-feedback" role="status" aria-live="polite">Select Read status to hear the current readings. Automatic announcements are off by default.</p>
+    </section>
+      <div class="monitor-grid">
+      <section class="panel safety-panel" aria-labelledby="safety-title">
+        <div class="section-heading">
+          <div class="section-title"><h2 id="safety-title">Conditions & safety</h2></div>
+        </div>
+        <div id="distance-card" class="hero wait">
+          <div class="hero-top">
+            <div>
+              <p class="label">Distance ahead</p>
+              <div class="distance-reading"><p id="distance" class="value" role="group" data-reading-name="Distance ahead" data-reading-unit="centimeters" aria-label="Distance ahead, Device disconnected">--</p><p id="unit" class="unit">cm</p></div>
+            </div>
+            <div id="state" class="state">Device disconnected</div>
+          </div>
+          <div class="lane-wrap">
+            <div class="lane-caption"><span>Near · Alert zone</span><span>Far</span></div>
+            <div class="lane" aria-hidden="true">
+              <div id="lane-alarm" class="lane-alarm"></div>
+              <div id="lane-mark" class="lane-mark"></div>
+              <div id="lane-puck" class="lane-puck" hidden></div>
+            </div>
+          </div>
+        </div>
+        <div id="posture-card" class="posture unknown">
+          <div class="posture-reading"><p class="label">Fall monitoring</p><p id="posture" class="posture-value">Sensor unavailable</p></div>
+          <p id="posture-note" class="posture-note">Not connected</p>
+        </div>
+
+      </section>
+      <section class="panel climate-panel" aria-labelledby="climate-title">
+        <div class="section-heading">
+          <div class="section-title"><h2 id="climate-title">Environment</h2></div>
+        </div>
+        <div class="climate-grid">
+          <div class="climate-metric"><p class="label">Temperature </p><div class="metric-reading"><p id="temperature" class="climate-value" role="group" data-reading-name="Temperature" data-reading-unit="degrees Celsius" aria-label="Temperature, Device disconnected">—</p><span class="unit">°C</span></div></div>
+          <div class="climate-metric"><p class="label">Humidity </p><div class="metric-reading"><p id="humidity" class="climate-value" role="group" data-reading-name="Humidity" data-reading-unit="percent" aria-label="Humidity, Device disconnected">—</p><span class="unit">%</span></div></div>
+        </div>
+      </section>
+      </div>
+    </section>
+    <section id="page-device" class="app-page" role="tabpanel" aria-labelledby="tab-device" tabindex="0" hidden>
+      <div class="page-intro"><p class="eyebrow">Device overview</p><h2>Cane status</h2><p>Check orientation, sensor health and alert settings.</p></div>
+      <div class="device-grid">
+      <section class="panel imu" aria-labelledby="model-title">
+        <div class="section-heading">
+          <div class="section-title"><h2 id="model-title">Model & orientation</h2></div>
+          <p id="mpu-status" aria-label="Orientation sensor status">—</p>
+        </div>
+        <div class="stage">
+          <canvas id="cane-model" role="img" aria-label="3D guide cane model that follows sensor orientation"></canvas>
+          <div class="stage-foot"><button id="reset-view" type="button">Reset view</button></div>
+        </div>
+        <div class="imu-info">
+          <div class="angles">
+            <span>Pitch<b id="pitch" role="group" data-reading-name="Pitch" data-reading-unit="degrees" aria-label="Pitch, Device disconnected">—</b></span>
+            <span>Roll<b id="roll" role="group" data-reading-name="Roll" data-reading-unit="degrees" aria-label="Roll, Device disconnected">—</b></span>
+            <span>Heading<b id="yaw" role="group" data-reading-name="Relative heading" data-reading-unit="degrees" aria-label="Relative heading, Device disconnected">—</b></span>
+          </div>
+          <details class="measurement-details"><summary>Acceleration</summary><p id="imu-acc" class="imu-acc" role="group" aria-label="Acceleration, Device disconnected">Acceleration —</p></details>
+        </div>
+      </section>
+        <div class="device-sidebar">
+<section class="panel health-panel" aria-labelledby="device-health-title">
+        <div class="section-heading"><h2 id="device-health-title">Sensor health</h2></div>
+      <div id="sensor-health" class="sensor-health" role="status" aria-live="polite" aria-atomic="true">
+        <h3 id="sensor-health-title">Sensor status</h3>
+        <p id="sensor-health-note">No device connected.</p>
+        <ul id="sensor-health-list" hidden></ul>
+      </div>
+      </section>
+      <section class="panel threshold-card" aria-labelledby="settings-title">
+        <div class="section-heading">
+          <div class="section-title"><h2 id="settings-title">Alert settings</h2></div>
+          <p id="threshold" class="threshold-now" role="group" data-reading-name="Current alert threshold" data-reading-unit="centimeters" aria-label="Current alert threshold, 20 cm">20 cm</p>
+        </div>
+        <label class="label" for="threshold-input">Alert distance (cm)</label>
+        <form id="threshold-form">
+          <input id="threshold-input" type="number" min="2" max="400" step="1" inputmode="numeric" value="20" aria-label="Alert threshold, in centimeters" aria-describedby="threshold-hint">
+          <button id="set-threshold" type="submit" disabled>Save threshold</button>
+        </form>
+        <p id="threshold-hint" class="hint">Range: 2–400 cm</p>
+
+      </section>
+        </div>
+      </div>
+    </section>
+    <section id="page-logs" class="app-page" role="tabpanel" aria-labelledby="tab-logs" tabindex="0" hidden>
+      <div class="page-intro"><p class="eyebrow">Activity history</p><h2>Data logs</h2><p>Review state changes and recorded alerts.</p></div>
+      <section class="panel fall-log" aria-labelledby="fall-log-title">
+        <div class="section-heading">
+          <div class="section-title"><h2 id="fall-log-title">Event log</h2></div>
+          <button id="export-log" type="button">Export CSV</button>
+        </div>
+        <ol id="fall-log" tabindex="0" aria-label="Event log"></ol>
+      </section>
+      <p class="log-note">Logs are stored in this browser, with up to 200 events. Export a CSV for analysis.</p>
+    </section>
+    <details class="page-help">
+      <summary>Help</summary>
+      <div class="help-content">
+        <h3>Speech</h3>
+        <p>Select Read status to hear conditions, device status and sensor readings. Enable Auto announcements to hear state changes. You can stop speech during playback.</p>
+        <h3>Obstacle alerts</h3>
+        <p>Normal: green light and no obstacle alert. Near: yellow light, one beep and one vibration. Very close: red light, two beeps and two vibrations. Readings below the threshold are very close; below twice the threshold are near. Exit boundaries add half the threshold (at least 2 cm), capped at 400 cm. Entry and exit require three consecutive readings. Distance alerts take priority over fall vibration.</p>
+        <h3>Model & orientation</h3>
+        <p>Drag the model or use the arrow keys to adjust the view. Press Home to reset. The model is illustrative. Heading is relative and drifts over time.</p>
+        <h3>Event log</h3>
+        <p>Events use the time this computer received each change. A continuous fall is recorded once. After export, fill in Observed outcome to assess false alarms and missed detections.</p>
+      </div>
+    </details>
+  </main>
+
+  <script src="navigation.js"></script>
+  <script src="cane-model.js"></script>
+  <script src="status-speech.js"></script>
+  <script src="event-log.js"></script>
+  <script>
+    const connectionBanner = document.querySelector("#connection-banner");
+    const connectionIcon = document.querySelector("#connection-icon");
+    const connectionStatusText = document.querySelector("#connection-status-text");
+    const connectBtn = document.querySelector("#connect");
+    const distanceEl = document.querySelector("#distance");
+    const unitEl = document.querySelector("#unit");
+    const stateEl = document.querySelector("#state");
+    const cardEl = document.querySelector("#distance-card");
+    const lane = document.querySelector(".lane");
+    const laneAlarm = document.querySelector("#lane-alarm");
+    const laneMark = document.querySelector("#lane-mark");
+    const lanePuck = document.querySelector("#lane-puck");
+    const postureCard = document.querySelector("#posture-card");
+    const postureEl = document.querySelector("#posture");
+    const postureNote = document.querySelector("#posture-note");
+    const fallLog = document.querySelector("#fall-log");
+    const exportLogBtn = document.querySelector("#export-log");
+    const cane = document.querySelector("#cane-model");
+    const mpuStatus = document.querySelector("#mpu-status");
+    const pitchEl = document.querySelector("#pitch");
+    const rollEl = document.querySelector("#roll");
+    const yawEl = document.querySelector("#yaw");
+    const imuAcc = document.querySelector("#imu-acc");
+    const temperatureEl = document.querySelector("#temperature");
+    const humidityEl = document.querySelector("#humidity");
+    const thresholdEl = document.querySelector("#threshold");
+    const form = document.querySelector("#threshold-form");
+    const input = document.querySelector("#threshold-input");
+    const setBtn = document.querySelector("#set-threshold");
+    const messageEl = document.querySelector("#message");
+
+    const view = {
+      connected: false,
+      distance: null,
+      outOfRange: false,
+      threshold: 20,
+      seenDistance: false,
+      temperature: null,
+      humidity: null,
+      posture: null,
+      mpuOk: null,
+      mpuFault: null,
+      climateError: false,
+      distanceStale: false,
+      climateStale: false,
+      postureStale: false
+    };
+
+    // Distance updates about every 0.5 s, posture every 1 s and climate every 2 s. Mark data stale after 5 s.
+    const STALE_MS = 5000;
+
+    const pose = { pitch: 0, roll: 0, yaw: 0, last: 0, ready: false };
+    const recentDistances = [];
+    let bandHold = "";
+    const eventLog = new EventLog({
+      list: fallLog,
+      exportButton: exportLogBtn,
+      getReading: () => ({
+        connected: view.connected,
+        seen: view.seenDistance,
+        stale: view.distanceStale,
+        outOfRange: view.outOfRange,
+        distance: view.distance,
+        threshold: view.threshold,
+        band: () => confirmedBand(),
+        near: () => view.distance != null && view.distance < nearLimit()
+      })
+    });
+
+    const model = new CaneModel(cane);
+    document.querySelector("#reset-view").addEventListener("click", () => model.resetView());
+    const statusSpeech = new StatusSpeech({
+      readButton: document.querySelector("#speech-read"),
+      autoButton: document.querySelector("#speech-auto"),
+      stopButton: document.querySelector("#speech-stop"),
+      feedback: document.querySelector("#speech-feedback"),
+      getSnapshot: () => ({
+        connected: view.connected,
+        stale: view.distanceStale || view.climateStale || view.postureStale,
+        distance: view.connected && !view.distanceStale && view.seenDistance && !view.outOfRange ? view.distance : null,
+        distanceState: stateEl.textContent,
+        postureState: postureEl.textContent,
+        climateStale: view.climateStale,
+        sensorIssues: getSensorIssues(),
+        sensorHealthNote: document.querySelector("#sensor-health-note").textContent,
+        temperature: view.connected && !view.climateStale ? view.temperature : null,
+        humidity: view.connected && !view.climateStale ? view.humidity : null
+      })
+    });
+    let readTask = null;
+    let busy = false;
+    let writing = false;
+    let lastImuAt = 0;
+    let lastDistanceAt = 0;
+    let lastClimateAt = 0;
+    let lastPostureAt = 0;
+    let port = null;
+    let reader = null;
+    let keepReading = false;
+
+    function getSensorIssues() {
+      if (!view.connected) return [];
+      const issues = [];
+      const add = (id, name, detail, severity = "warning") => issues.push({ id, name, detail, severity });
+      if (view.distanceStale) add("distance", "Distance sensor", "Distance data has not updated for over five seconds. Conditions ahead cannot be determined. ");
+      else if (view.seenDistance && view.outOfRange) add("distance", "Distance sensor", "No valid distance echo, or the reading is out of range. Distance measurement is unavailable. ");
+      if (view.postureStale) add("posture", "Fall sensor", "Fall data has not updated for over five seconds. Fall monitoring is unavailable. ");
+      if (view.climateStale) add("climate", "Climate sensor", "Temperature and humidity data has not updated for over five seconds. ");
+      else if (view.climateError) add("climate", "Climate sensor", "Temperature and humidity readings failed. Check the sensor connection. ", "fault");
+      if (view.mpuFault || view.mpuOk === false) {
+        const reason = view.mpuFault || "Not responding";
+        add("imu", "Orientation sensor", "Orientation sensor: " + reason.toLowerCase() + ". Orientation monitoring is unavailable. ", reason === "Data timeout" ? "warning" : "fault");
+      }
+      return issues;
+    }
+
+    let sensorHealthKey = "";
+    function renderSensorHealth() {
+      const issues = getSensorIssues();
+      const ready = view.connected && view.seenDistance && view.posture != null && view.temperature != null && view.humidity != null && view.mpuOk && pose.ready;
+      const note = !view.connected ? "No device connected."
+        : ready ? "Sensor data is up to date."
+        : "Waiting for sensor data.";
+      const key = JSON.stringify([issues, note]);
+      if (key === sensorHealthKey) return;
+      sensorHealthKey = key;
+      const panel = document.querySelector("#sensor-health");
+      const list = document.querySelector("#sensor-health-list");
+      const noteEl = document.querySelector("#sensor-health-note");
+      panel.className = "sensor-health" + (issues.length ? issues.some(issue => issue.severity === "fault") ? " fault" : " warning" : "");
+      document.querySelector("#sensor-health-title").textContent = issues.length ? "Sensor alerts" : "Sensor status";
+      list.replaceChildren();
+      for (const issue of issues) {
+        const item = document.createElement("li");
+        item.textContent = issue.detail;
+        list.append(item);
+      }
+      list.hidden = issues.length === 0;
+      noteEl.hidden = issues.length > 0;
+      noteEl.textContent = note;
+    }
+
+    function syncReadingLabels() {
+      const label = (element, text) => {
+        if (element.getAttribute("aria-label") !== text) element.setAttribute("aria-label", text);
+      };
+      const imuUnavailable = !view.connected ? "Device disconnected" : view.mpuOk === false ? "Sensor not responding" : "Waiting for orientation data";
+      for (const element of document.querySelectorAll("[data-reading-name]")) {
+        const name = element.dataset.readingName;
+        const unit = element.dataset.readingUnit;
+        const value = element.textContent.trim().replace(/\s*cm$|°/g, "");
+        if (/^-?\d+(?:\.\d+)?$/.test(value)) {
+          label(element, element === humidityEl ? name + ", " + value + " percent" : name + ", " + value + " " + unit);
+          continue;
+        }
+        let reason;
+        if (!view.connected) reason = "Device disconnected";
+        else if ([pitchEl, rollEl, yawEl].includes(element)) reason = imuUnavailable;
+        else if (element === distanceEl) reason = view.outOfRange && !view.distanceStale ? "Out of range; no valid echo" : stateEl.textContent;
+        else reason = view.climateStale ? "Stale data" : view.climateError ? "Sensor read failed" : "No valid data";
+        label(element, name + ", " + reason);
+      }
+      const acceleration = imuAcc.textContent.match(/^Acceleration\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+g$/);
+      label(imuAcc, acceleration
+        ? "Acceleration, X axis " + acceleration[1] + " g, Y axis " + acceleration[2] + " g, Z axis " + acceleration[3] + " g; values are in units of gravitational acceleration"
+        : "Acceleration, " + imuUnavailable);
+    }
+
+    function renderClimate() {
+      if (!view.connected) {
+        temperatureEl.textContent = "—";
+        humidityEl.textContent = "—";
+        return;
+      }
+      if (view.climateStale) {
+        temperatureEl.textContent = "Stale";
+        humidityEl.textContent = "Stale";
+        return;
+      }
+      temperatureEl.textContent = view.temperature == null ? "—" : String(view.temperature);
+      humidityEl.textContent = view.humidity == null ? "—" : String(view.humidity);
+    }
+
+    function renderPosture() {
+      postureCard.classList.remove("unknown", "normal", "fallen", "unavailable");
+      if (view.connected && view.postureStale) {
+        postureEl.textContent = "Sensor unavailable";
+        postureNote.textContent = "Stale data · No update for over 5 seconds";
+        postureCard.classList.add("unavailable");
+        return;
+      }
+      if (!view.connected || view.posture == null) {
+        postureEl.textContent = "Sensor unavailable";
+        postureNote.textContent = view.connected ? "Waiting for sensor data" : "Device disconnected";
+        postureCard.classList.add("unavailable");
+        return;
+      }
+      if (view.posture === "FALL") {
+        postureEl.textContent = "Fall";
+        postureNote.textContent = "Sensor reports a fall";
+        postureCard.classList.add("fallen");
+        return;
+      }
+      postureEl.textContent = "Normal";
+      postureNote.textContent = "Sensor reports no fall";
+      postureCard.classList.add("normal");
+    }
+
+    function renderImu() {
+      if (!view.connected || view.mpuOk == null) {
+        mpuStatus.textContent = view.connected ? "Waiting for data" : "—";
+        pitchEl.textContent = "—";
+        rollEl.textContent = "—";
+        yawEl.textContent = "—";
+        imuAcc.textContent = "Acceleration —";
+        model.setPose(0, 0, 0);
+        pose.ready = false;
+        return;
+      }
+      if (!view.mpuOk) {
+        mpuStatus.textContent = "Not responding";
+        pitchEl.textContent = rollEl.textContent = yawEl.textContent = "—";
+        imuAcc.textContent = "Acceleration —";
+        pose.ready = false;
+        model.setPose(0, 0, 0);
+        return;
+      }
+      mpuStatus.textContent = pose.ready && !view.mpuFault ? "Normal" : "Waiting for orientation data";
+    }
+
+    function updatePose(ax, ay, az, gx, gy, gz) {
+      view.mpuOk = true;
+      view.mpuFault = null;
+      const now = performance.now();
+      lastImuAt = now;
+      const accRoll = Math.atan2(ay, az) * 180 / Math.PI;
+      const accPitch = Math.atan2(-ax, Math.hypot(ay, az)) * 180 / Math.PI;
+      if (!pose.ready || now - pose.last > 1000) {
+        pose.roll = accRoll;
+        pose.pitch = accPitch;
+        pose.yaw = 0;
+        pose.last = now;
+        pose.ready = true;
+      } else {
+        let dt = (now - pose.last) / 1000;
+        pose.last = now;
+        if (!(dt > 0 && dt < 0.25)) dt = 0.05;
+        const blend = Math.exp(-dt / 0.5);
+        const predictedRoll = pose.roll + gx * dt;
+        const deltaRoll = ((accRoll - predictedRoll + 540) % 360 + 360) % 360 - 180;
+        pose.roll = ((predictedRoll + (1 - blend) * deltaRoll + 540) % 360 + 360) % 360 - 180;
+        pose.pitch = blend * (pose.pitch + gy * dt) + (1 - blend) * accPitch;
+        pose.yaw = ((pose.yaw + gz * dt + 540) % 360 + 360) % 360 - 180;
+      }
+      model.setPose(pose.pitch, pose.roll, pose.yaw);
+      mpuStatus.textContent = "Normal";
+      pitchEl.textContent = pose.pitch.toFixed(0) + "°";
+      rollEl.textContent = pose.roll.toFixed(0) + "°";
+      yawEl.textContent = pose.yaw.toFixed(0) + "°";
+      imuAcc.textContent = "Acceleration " + ax.toFixed(2) + "  " + ay.toFixed(2) + "  " + az.toFixed(2) + " g";
+      syncReadingLabels();
+      renderSensorHealth();
+      statusSpeech.observe(statusSpeech.getSnapshot());
+    }
+
+    function renderGauge() {
+      const available = view.connected && view.seenDistance && !view.distanceStale && !view.outOfRange && view.distance != null;
+      lane.classList.toggle("unavailable", !available);
+      laneAlarm.hidden = laneMark.hidden = lanePuck.hidden = !available;
+      if (!available) {
+        laneAlarm.style.width = "0%";
+        laneMark.style.left = "0%";
+        lanePuck.style.left = "0%";
+        return;
+      }
+      const scale = Math.min(400, Math.max(80, view.threshold * 2, view.distance));
+      const alarmPct = Math.min(100, (view.threshold / scale) * 100);
+      laneAlarm.style.width = alarmPct + "%";
+      laneMark.style.left = alarmPct + "%";
+      lanePuck.style.left = Math.min(100, (view.distance / scale) * 100) + "%";
+    }
+
+    function setMode(mode) {
+      cardEl.classList.remove("wait", "safe", "near", "alarm", "far", "stale");
+      document.body.classList.remove("wait", "safe", "near", "alarm", "far", "stale");
+      cardEl.classList.add(mode);
+      document.body.classList.add(mode);
+    }
+
+    function renderConnectionStatus() {
+      // Use the same 5-second timeout as the data cards. Disconnection takes priority over stale data.
+      const stale = view.distanceStale || view.climateStale || view.postureStale;
+      const mode = !view.connected ? "offline" : stale ? "stale" : "online";
+      const states = {
+        offline: ["🔴", "Device disconnected. No live data. Check the connection."],
+        stale: ["🟡", "Stale data (over 5 seconds). For reference only."],
+        online: ["🟢", "Device connected · Live data updating."]
+      };
+      // Update only on state changes to avoid repeated screen-reader announcements for each sample.
+      if (!connectionBanner.classList.contains(mode)) {
+        connectionBanner.className = "connection-banner " + mode;
+        connectionIcon.textContent = states[mode][0];
+        connectionStatusText.textContent = states[mode][1];
+      }
+    }
+
+    function render() {
+      try {
+      renderConnectionStatus();
+      thresholdEl.textContent = view.threshold + " cm";
+      renderClimate();
+      renderGauge();
+      renderPosture();
+      renderImu();
+
+      if (!view.connected) {
+        distanceEl.textContent = "--";
+        unitEl.textContent = "cm";
+        stateEl.textContent = "Device disconnected";
+        setMode("wait");
+        return;
+      }
+
+      if (view.distanceStale) {
+        distanceEl.textContent = "--";
+        unitEl.textContent = "No new data for over 5 seconds";
+        stateEl.textContent = "Stale data";
+        setMode("stale");
+        return;
+      }
+
+      if (!view.seenDistance) {
+        distanceEl.textContent = "--";
+        unitEl.textContent = "cm";
+        stateEl.textContent = "Waiting for data";
+        setMode("wait");
+        return;
+      }
+
+      if (view.outOfRange || view.distance == null) {
+        bandHold = "";
+        distanceEl.textContent = "Out of range";
+        unitEl.textContent = "No valid echo";
+        stateEl.textContent = "Out of range";
+        setMode("far");
+        return;
+      }
+
+      distanceEl.textContent = String(view.distance);
+      unitEl.textContent = "cm";
+      const band = confirmedBand();
+      if (band === "close") {
+        stateEl.textContent = "Very close ahead";
+        setMode("alarm");
+      } else if (band === "near") {
+        stateEl.textContent = "Obstacle nearby";
+        setMode("near");
+      } else if (view.distance < nearLimit()) {
+        stateEl.textContent = "Confirming";
+        setMode("safe");
+      } else {
+        stateEl.textContent = "No nearby obstacle";
+        setMode("safe");
+      }
+      } finally {
+        renderSensorHealth();
+        syncReadingLabels();
+        eventLog.observe();
+        statusSpeech.observe(statusSpeech.getSnapshot());
+      }
+    }
+
+    function nearLimit() {
+      return Math.min(400, view.threshold * 2);
+    }
+
+    function exitGap() {
+      return Math.max(2, Math.floor(view.threshold / 2));
+    }
+
+    function confirmedBand() {
+      if (recentDistances.length < 3 || recentDistances.some((cm) => cm == null)) {
+        bandHold = "";
+        return "";
+      }
+      const allBelow = (limit) => recentDistances.every((cm) => cm < limit);
+      const allBeyond = (limit) => recentDistances.every((cm) => cm >= limit);
+      const closeExit = Math.min(400, view.threshold + exitGap());
+      const nearExit = Math.min(400, nearLimit() + exitGap());
+      if (allBelow(view.threshold)) {
+        bandHold = "close";
+        return "close";
+      }
+      if (bandHold === "close" && !allBeyond(closeExit)) return "close";
+      if (allBelow(nearLimit()) || (bandHold === "close" && !allBeyond(nearExit))) {
+        bandHold = "near";
+        return "near";
+      }
+      if (bandHold === "near" && !allBeyond(nearExit)) return "near";
+      bandHold = "normal";
+      return "normal";
+    }
+
+    function rememberDistance(cm) {
+      recentDistances.push(cm);
+      if (recentDistances.length > 3) recentDistances.shift();
+    }
+
+    function setMessage(text, isError) {
+      messageEl.textContent = text;
+      messageEl.classList.toggle("error", Boolean(isError));
+    }
+
+    function handleLine(line) {
+      line = line.replace(/\r/g, "").trim();
+      if (!line) return;
+
+      let matched = line.match(/^DIST (\d+)$/);
+      if (matched) {
+        view.distance = Number(matched[1]);
+        view.outOfRange = false;
+        view.seenDistance = true;
+        view.distanceStale = false;
+        lastDistanceAt = performance.now();
+        rememberDistance(view.distance);
+        render();
+        return;
+      }
+      if (line === "RANGE_OVER") {
+        view.distance = null;
+        view.outOfRange = true;
+        view.seenDistance = true;
+        view.distanceStale = false;
+        lastDistanceAt = performance.now();
+        rememberDistance(null);
+        render();
+        return;
+      }
+      matched = line.match(/^TEMP (-?\d+)$/);
+      if (matched) {
+        view.temperature = Number(matched[1]);
+        if (view.humidity != null) view.climateError = false;
+        view.climateStale = false;
+        lastClimateAt = performance.now();
+        render();
+        return;
+      }
+      matched = line.match(/^HUM (\d+)$/);
+      if (matched) {
+        view.humidity = Number(matched[1]);
+        if (view.temperature != null) view.climateError = false;
+        view.climateStale = false;
+        lastClimateAt = performance.now();
+        render();
+        return;
+      }
+      if (line === "CLIMATE_FAIL") {
+        view.climateError = true;
+        view.temperature = null;
+        view.humidity = null;
+        view.climateStale = false;
+        lastClimateAt = performance.now();
+        render();
+        return;
+      }
+      if (line === "POSTURE OK" || line === "POSTURE FALL") {
+        const next = line.endsWith("FALL") ? "FALL" : "OK";
+        eventLog.noteFall(next);
+        view.posture = next;
+        view.postureStale = false;
+        lastPostureAt = performance.now();
+        render();
+        return;
+      }
+      matched = line.match(/^THRESH (\d+)$/);
+      if (matched) {
+        const value = Number(matched[1]);
+        const previous = view.threshold;
+        view.threshold = value;
+        eventLog.noteThreshold(previous, value);
+        input.value = String(view.threshold);
+        setMessage("Threshold set to " + view.threshold + " cm", false);
+        render();
+        return;
+      }
+      if (line === "THRESH_BAD") {
+        setMessage("Enter a whole number from 2 to 400", true);
+        return;
+      }
+      if (line === "MPU FAIL" || line === "MPU READ_FAIL") {
+        view.mpuOk = false;
+        view.mpuFault = line === "MPU FAIL" ? "Initialization failed" : "Read failed";
+        render();
+        return;
+      }
+      if (line.startsWith("MPU OK")) {
+        view.mpuOk = true;
+        lastImuAt = performance.now();
+        render();
+        return;
+      }
+      matched = line.match(/^IMU\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)$/);
+      if (matched) {
+        updatePose(
+          Number(matched[1]),
+          Number(matched[2]),
+          Number(matched[3]),
+          Number(matched[4]),
+          Number(matched[5]),
+          Number(matched[6])
+        );
+      }
+    }
+
+    async function readLoop() {
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (port && port.readable && keepReading) {
+        reader = port.readable.getReader();
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) return;
+            buffer += decoder.decode(value, { stream: true });
+            if (buffer.length > 16384 && !buffer.includes("\n")) buffer = "";
+            let nl = buffer.indexOf("\n");
+            while (nl >= 0) {
+              handleLine(buffer.slice(0, nl));
+              buffer = buffer.slice(nl + 1);
+              nl = buffer.indexOf("\n");
+            }
+          }
+        } catch (error) {
+          if (keepReading) setMessage("Serial reading interrupted", true);
+          break;
+        } finally {
+          reader.releaseLock();
+          reader = null;
+        }
+      }
+    }
+
+    async function connect() {
+      if (!("serial" in navigator)) {
+        setMessage("Open this page in desktop Chrome or Edge", true);
+        return;
+      }
+      try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+      } catch (error) {
+        if (error && error.name === "NotFoundError") return;
+        setMessage("Could not open the serial port", true);
+        port = null;
+        return;
+      }
+
+      keepReading = true;
+      view.connected = true;
+      view.seenDistance = false;
+      view.posture = null;
+      view.mpuOk = null;
+      view.mpuFault = null;
+      view.climateError = false;
+      view.distanceStale = false;
+      view.climateStale = false;
+      view.postureStale = false;
+      recentDistances.length = 0;
+      bandHold = "";
+      eventLog.reset();
+      const started = performance.now();
+      lastImuAt = started;
+      lastDistanceAt = started;
+      lastClimateAt = started;
+      lastPostureAt = started;
+      connectBtn.textContent = "Disconnect";
+      setBtn.disabled = false;
+      setMessage("", false);
+      render();
+      readTask = readLoop().finally(async () => {
+        if (keepReading) {
+          await disconnect();
+          setMessage("", false);
+        }
+      });
+    }
+
+    async function disconnect() {
+      // Clear old status before releasing the serial port so closing does not leave a stale normal indication.
+      keepReading = false;
+      const closingPort = port;
+      const closingReader = reader;
+      port = null;
+      connectBtn.disabled = true;
+      view.connected = false;
+      view.seenDistance = false;
+      view.temperature = null;
+      view.humidity = null;
+      view.posture = null;
+      view.mpuOk = null;
+      view.mpuFault = null;
+      view.climateError = false;
+      view.distanceStale = false;
+      view.climateStale = false;
+      view.postureStale = false;
+      recentDistances.length = 0;
+      bandHold = "";
+      eventLog.reset();
+      lastImuAt = 0;
+      lastDistanceAt = 0;
+      lastClimateAt = 0;
+      lastPostureAt = 0;
+      connectBtn.textContent = "Connect";
+      setBtn.disabled = true;
+      setMessage("", false);
+      render();
+      try {
+        if (closingReader) {
+          try { await closingReader.cancel(); } catch (error) {}
+        }
+        if (closingPort) {
+          try { await closingPort.close(); } catch (error) {}
+        }
+      } finally {
+        connectBtn.disabled = busy;
+      }
+    }
+
+    connectBtn.addEventListener("click", async () => {
+      if (busy || writing) return;
+      busy = true;
+      connectBtn.disabled = true;
+      try {
+        if (view.connected) { await disconnect(); await readTask; }
+        else await connect();
+      } finally { busy = false; connectBtn.disabled = false; }
+    });
+
+    navigator.serial?.addEventListener("disconnect", (event) => {
+      if (port && (event.target === port || event.port === port)) {
+        disconnect().then(() => setMessage("", false));
+      }
+    });
+    function expireStale() {
+      if (!view.connected) return;
+      const now = performance.now();
+      let changed = false;
+      if (!view.distanceStale && now - lastDistanceAt > STALE_MS) {
+        view.distanceStale = true;
+        recentDistances.length = 0;
+        bandHold = "";
+        changed = true;
+      }
+      if (!view.climateStale && now - lastClimateAt > STALE_MS) {
+        view.climateStale = true;
+        changed = true;
+      }
+      if (!view.postureStale && now - lastPostureAt > STALE_MS) {
+        view.postureStale = true;
+        changed = true;
+      }
+      if (view.mpuOk !== false && lastImuAt && now - lastImuAt > 1500) {
+        view.mpuOk = false;
+        view.mpuFault = "Data timeout";
+        changed = true;
+      }
+      if (changed) render();
+    }
+
+    setInterval(expireStale, 500);
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (writing || busy || !port || !port.writable) return;
+      const value = Number(input.value);
+      if (!Number.isInteger(value) || value < 2 || value > 400) {
+        setMessage("Enter a whole number from 2 to 400", true);
+        return;
+      }
+      writing = true;
+      setBtn.disabled = true;
+      let writer;
+      try {
+        writer = port.writable.getWriter();
+        await writer.write(new TextEncoder().encode(String(value) + "\n"));
+        setMessage("Setting threshold…", false);
+      } catch (error) {
+        setMessage("Send failed", true);
+      } finally {
+        writer?.releaseLock();
+        writing = false;
+        setBtn.disabled = !view.connected;
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
