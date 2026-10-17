@@ -6,6 +6,11 @@ This project develops an ESP32-based guide cane prototype that combines obstacle
 
 The current implementation supports distance-based alerts, sensor monitoring, optional spoken summaries and event recording. The project remains at the prototype stage; its effectiveness during mobility tasks has yet to be established through physical testing and user evaluation.
 
+## Learning log and demonstration
+
+- [ESP32 smart cane learning log — 10–16 October 2026](docs/learning/2026-10-10-to-2026-10-16-esp32-smart-cane-learning-log.md): development notes, test observations and proposed next steps, written in British English. This is a historical record of that learning period.
+- [Watch or download the prototype demonstration](docs/videos/smart-cane-prototype-demo.mp4?raw=true): approximately 1 minute 18 seconds (14.3 MB). The recording illustrates the prototype; it does not establish sensing accuracy or effectiveness during mobility tasks.
+
 ## System design
 
 The system follows a simple information flow:
