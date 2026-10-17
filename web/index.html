@@ -412,8 +412,11 @@
       view.mpuFault = null;
       const now = performance.now();
       lastImuAt = now;
-      const accRoll = Math.atan2(ay, az) * 180 / Math.PI;
-      const accPitch = Math.atan2(-ax, Math.hypot(ay, az)) * 180 / Math.PI;
+      // The module is mounted with its Y axis along the shaft. Upright reads about +1 g on Y.
+      // Model axes match the sensor: X right, Y toward the handle, Z out of the board.
+      const horizontal = Math.hypot(ax, ay);
+      const accRoll = Math.atan2(ax, ay) * 180 / Math.PI;
+      const accPitch = Math.atan2(-az, horizontal) * 180 / Math.PI;
       if (!pose.ready || now - pose.last > 1000) {
         pose.roll = accRoll;
         pose.pitch = accPitch;
@@ -425,11 +428,11 @@
         pose.last = now;
         if (!(dt > 0 && dt < 0.25)) dt = 0.05;
         const blend = Math.exp(-dt / 0.5);
-        const predictedRoll = pose.roll + gx * dt;
+        const predictedRoll = pose.roll + gz * dt;
         const deltaRoll = ((accRoll - predictedRoll + 540) % 360 + 360) % 360 - 180;
         pose.roll = ((predictedRoll + (1 - blend) * deltaRoll + 540) % 360 + 360) % 360 - 180;
-        pose.pitch = blend * (pose.pitch + gy * dt) + (1 - blend) * accPitch;
-        pose.yaw = ((pose.yaw + gz * dt + 540) % 360 + 360) % 360 - 180;
+        pose.pitch = blend * (pose.pitch + gx * dt) + (1 - blend) * accPitch;
+        pose.yaw = ((pose.yaw + gy * dt + 540) % 360 + 360) % 360 - 180;
       }
       model.setPose(pose.pitch, pose.roll, pose.yaw);
       mpuStatus.textContent = "Normal";

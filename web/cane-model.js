@@ -1,5 +1,6 @@
-/* Dependency-free, depth-sorted 3D schematic. MPU axes: pitch X, yaw Y, roll Z.
-   Sensor installation can require a different axis mapping; this matches the existing page. */
+/* Dependency-free, depth-sorted 3D schematic.
+   Shaft +Y points toward the handle. Pose is pitch about X, heading about Y, roll about Z.
+   The mounted MPU6050 uses the same axes: Y along the shaft, Z out of the board. */
 class CaneModel {
   constructor(canvas) {
     this.canvas = canvas;
